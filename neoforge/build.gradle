@@ -16,6 +16,7 @@ sourceSets.main.resources.srcDir tasks.register('generateModMetadata', ProcessRe
         neo_version_range      : rootProject.neo_version_range,
         loader_version_range   : rootProject.loader_version_range,
         ftb_library_version_range: rootProject.ftb_library_version_range,
+        ftb_essentials_version_range: rootProject.ftb_essentials_version_range,
         mod_id                 : rootProject.mod_id,
         mod_name               : rootProject.mod_name,
         mod_license            : rootProject.mod_license,
@@ -53,7 +54,9 @@ neoForge.ideSyncTask tasks.named('generateModMetadata')
 
 dependencies {
     compileOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
+    compileOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
     runtimeOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
+    runtimeOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
     runtimeOnly "maven.modrinth:architectury-api:13.0.8+neoforge"
 }
 

@@ -16,7 +16,6 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
@@ -26,7 +25,6 @@ public class PaperPlaneNeoForge {
         PaperPlaneRegistries.register(modBus);
         modBus.addListener(this::registerPayloads);
         modBus.addListener(this::addCreativeTabItems);
-        NeoForge.EVENT_BUS.addListener(this::onServerTick);
         NeoForge.EVENT_BUS.addListener(this::onPlayerLogout);
         if (FMLEnvironment.dist == Dist.CLIENT) {
             PaperPlaneClient.register(modBus);
@@ -63,10 +61,6 @@ public class PaperPlaneNeoForge {
             event.accept(PaperPlaneRegistries.SOGGY_PAPER_PLANE.get());
             event.accept(PaperPlaneRegistries.ENDER_PAPER_PLANE.get());
         }
-    }
-
-    private void onServerTick(ServerTickEvent.Post event) {
-        PaperPlane.tick(event.getServer());
     }
 
     private void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {

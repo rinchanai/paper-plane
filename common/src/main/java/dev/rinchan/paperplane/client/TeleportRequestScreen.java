@@ -1,8 +1,7 @@
 package dev.rinchan.paperplane.client;
 
-import dev.ftb.mods.ftblibrary.icon.Icon;
 import dev.ftb.mods.ftblibrary.ui.BaseScreen;
-import dev.ftb.mods.ftblibrary.ui.SimpleButton;
+import dev.ftb.mods.ftblibrary.ui.SimpleTextButton;
 import dev.ftb.mods.ftblibrary.ui.Theme;
 import dev.rinchan.paperplane.PaperPlaneNetworking;
 import java.util.UUID;
@@ -18,23 +17,25 @@ public class TeleportRequestScreen extends BaseScreen {
         this.requestId = requestId;
         this.requesterName = requesterName;
         this.enderPlane = enderPlane;
-        setSize(260, 104);
+        setSize(360, 120);
     }
 
     @Override
     public void addWidgets() {
-        SimpleButton accept = new SimpleButton(this, Component.translatable("screen.paper_plane.accept"), Icon.empty(), (button, mouseButton) -> {
+        SimpleTextButton accept = SimpleTextButton.accept(this, mouseButton -> {
             PaperPlaneNetworking.answerRequest(requestId, true);
             closeGui(false);
         });
-        accept.setPosAndSize(16, 68, 108, 20);
+        accept.setTitle(Component.translatable("screen.paper_plane.accept"));
+        accept.setPosAndSize(16, 86, 150, 20);
         add(accept);
 
-        SimpleButton deny = new SimpleButton(this, Component.translatable("screen.paper_plane.deny"), Icon.empty(), (button, mouseButton) -> {
+        SimpleTextButton deny = SimpleTextButton.cancel(this, mouseButton -> {
             PaperPlaneNetworking.answerRequest(requestId, false);
             closeGui(false);
         });
-        deny.setPosAndSize(136, 68, 108, 20);
+        deny.setTitle(Component.translatable("screen.paper_plane.deny"));
+        deny.setPosAndSize(194, 86, 150, 20);
         add(deny);
     }
 

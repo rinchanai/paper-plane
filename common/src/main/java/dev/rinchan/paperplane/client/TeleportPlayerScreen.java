@@ -3,7 +3,7 @@ package dev.rinchan.paperplane.client;
 import dev.ftb.mods.ftblibrary.icon.Icon;
 import dev.ftb.mods.ftblibrary.ui.BaseScreen;
 import dev.ftb.mods.ftblibrary.ui.Panel;
-import dev.ftb.mods.ftblibrary.ui.SimpleButton;
+import dev.ftb.mods.ftblibrary.ui.SimpleTextButton;
 import dev.ftb.mods.ftblibrary.ui.Theme;
 import dev.rinchan.paperplane.PaperPlaneNetworking;
 import dev.rinchan.paperplane.PlayerEntry;
@@ -24,7 +24,7 @@ public class TeleportPlayerScreen extends BaseScreen {
     @Override
     public void addWidgets() {
         if (players.isEmpty()) {
-            SimpleButton empty = new SimpleButton(this, Component.translatable("screen.paper_plane.no_players"), Icon.empty(), (button, mouseButton) -> closeGui(false));
+            SimpleTextButton empty = SimpleTextButton.create(this, Component.translatable("screen.paper_plane.no_players"), Icon.empty(), mouseButton -> closeGui(false));
             empty.setPosAndSize(12, 32, width - 24, 20);
             add(empty);
             return;
@@ -32,7 +32,7 @@ public class TeleportPlayerScreen extends BaseScreen {
 
         int y = 32;
         for (PlayerEntry player : players) {
-            SimpleButton button = new SimpleButton(this, Component.literal(player.name()), Icon.empty(), (b, mouseButton) -> {
+            SimpleTextButton button = SimpleTextButton.create(this, Component.literal(player.name()), Icon.empty(), mouseButton -> {
                 PaperPlaneNetworking.sendTeleportRequest(player::id, enderPlane);
                 closeGui(false);
             });

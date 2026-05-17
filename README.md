@@ -1,6 +1,6 @@
 # 纸飞机
 
-纸飞机 adds early-game player-to-player teleport requests through an FTB Library UI.
+纸飞机 adds early-game player-to-player teleport requests through an FTB Library UI backed by FTB Essentials' TPA system.
 
 ## Features
 
@@ -14,6 +14,7 @@ x - -
 
 - Right-click a 纸飞机 to open a player list UI and send a teleport request.
 - The target player receives an accept/deny UI.
+- Requests and acceptance are backed by FTB Essentials' TPA request handling.
 - When accepted, the requester teleports to the target player and consumes one normal/soggy paper plane.
 - Shift-right-click throws a paper plane as a slow arrow-like projectile.
 - A normal paper plane that gets wet becomes **飞不起来的纸飞机？**.
@@ -23,5 +24,6 @@ x - -
 
 - Minecraft 1.21.1
 - NeoForge
+- FTB Essentials
 - FTB Library
 - Architectury API, required by FTB Library

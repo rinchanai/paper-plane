@@ -1,26 +1,22 @@
 package dev.rinchan.paperplane;
 
+import dev.ftb.mods.ftbessentials.api.records.TPARequest;
+import dev.ftb.mods.ftbessentials.commands.impl.teleporting.TPACommand;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public final class PaperPlane {
     public static final String MOD_ID = "paper_plane";
-    public static final int REQUEST_TIMEOUT_TICKS = 60 * 20;
 
-    private static final Map<UUID, TeleportRequest> REQUESTS = new ConcurrentHashMap<>();
+    private static final TPACommand FTB_TPA = new TPACommand();
+    private static final Map<UUID, Boolean> PAPER_PLANE_REQUESTS = new ConcurrentHashMap<>();
 
     private PaperPlane() {
     }
@@ -44,63 +40,63 @@ public final class PaperPlane {
             return;
         }
 
-        UUID requestId = UUID.randomUUID();
-        REQUESTS.put(requestId, new TeleportRequest(requestId, requester.getUUID(), target.getUUID(), enderPlane, REQUEST_TIMEOUT_TICKS));
-        requester.sendSystemMessage(Component.translatable("message.paper_plane.request_sent", target.getGameProfile().getName()).withStyle(ChatFormatting.AQUA));
-        PacketDistributor.sendToPlayer(target, new TeleportRequestPromptPacket(requestId, requester.getGameProfile().getName(), enderPlane));
+        int result = FTB_TPA.tpa(requester, target, false);
+        if (result <= 0) {
+            return;
+        }
+
+        TPARequest ftbRequest = findFtbRequest(requester, target);
+        if (ftbRequest == null) {
+            requester.sendSystemMessage(Component.translatable("message.paper_plane.request_missing").withStyle(ChatFormatting.RED));
+            return;
+        }
+
+        PAPER_PLANE_REQUESTS.put(ftbRequest.id(), enderPlane);
+        PacketDistributor.sendToPlayer(target, new TeleportRequestPromptPacket(ftbRequest.id(), requester.getGameProfile().getName(), enderPlane));
     }
 
     public static void answerTeleport(ServerPlayer target, UUID requestId, boolean accepted) {
-        TeleportRequest request = REQUESTS.remove(requestId);
-        if (request == null || !request.targetId().equals(target.getUUID())) {
+        Boolean enderPlane = PAPER_PLANE_REQUESTS.get(requestId);
+        if (enderPlane == null) {
             target.sendSystemMessage(Component.translatable("message.paper_plane.request_missing").withStyle(ChatFormatting.RED));
             return;
         }
 
-        ServerPlayer requester = target.server.getPlayerList().getPlayer(request.requesterId());
+        TPARequest request = TPACommand.requests().get(requestId);
+        if (request == null) {
+            target.sendSystemMessage(Component.translatable("message.paper_plane.request_missing").withStyle(ChatFormatting.RED));
+            return;
+        }
+        ServerPlayer requester = target.server.getPlayerList().getPlayer(request.source().getUuid());
         if (requester == null) {
             target.sendSystemMessage(Component.translatable("message.paper_plane.requester_offline").withStyle(ChatFormatting.RED));
             return;
         }
 
         if (!accepted) {
-            requester.sendSystemMessage(Component.translatable("message.paper_plane.request_denied", target.getGameProfile().getName()).withStyle(ChatFormatting.YELLOW));
-            target.sendSystemMessage(Component.translatable("message.paper_plane.denied").withStyle(ChatFormatting.YELLOW));
+            PAPER_PLANE_REQUESTS.remove(requestId);
+            FTB_TPA.tpdeny(target, requestId.toString());
             return;
         }
-
-        if (!request.enderPlane() && !consumePlane(requester)) {
+        if (!enderPlane && !hasConsumablePlane(requester)) {
             requester.sendSystemMessage(Component.translatable("message.paper_plane.no_plane").withStyle(ChatFormatting.RED));
             target.sendSystemMessage(Component.translatable("message.paper_plane.requester_no_plane").withStyle(ChatFormatting.RED));
             return;
         }
-
-        ServerLevel destination = target.serverLevel();
-        requester.teleportTo(destination, target.getX(), target.getY(), target.getZ(), target.getYRot(), target.getXRot());
-        destination.playSound(null, target.blockPosition(), SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 0.8F, 1.2F);
-        requester.sendSystemMessage(Component.translatable("message.paper_plane.teleported", target.getGameProfile().getName()).withStyle(ChatFormatting.GREEN));
-        target.sendSystemMessage(Component.translatable("message.paper_plane.accepted", requester.getGameProfile().getName()).withStyle(ChatFormatting.GREEN));
-    }
-
-    public static void tick(MinecraftServer server) {
-        Iterator<Map.Entry<UUID, TeleportRequest>> iterator = REQUESTS.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<UUID, TeleportRequest> entry = iterator.next();
-            TeleportRequest request = entry.getValue().tick();
-            if (request.remainingTicks() <= 0) {
-                iterator.remove();
-                ServerPlayer requester = server.getPlayerList().getPlayer(request.requesterId());
-                if (requester != null) {
-                    requester.sendSystemMessage(Component.translatable("message.paper_plane.request_expired").withStyle(ChatFormatting.YELLOW));
-                }
-            } else {
-                entry.setValue(request);
+        int result = FTB_TPA.tpaccept(target, requestId.toString());
+        if (result > 0) {
+            PAPER_PLANE_REQUESTS.remove(requestId);
+            if (!enderPlane) {
+                consumePlane(requester);
             }
         }
     }
 
     public static void clearPlayer(ServerPlayer player) {
-        REQUESTS.entrySet().removeIf(entry -> entry.getValue().requesterId().equals(player.getUUID()) || entry.getValue().targetId().equals(player.getUUID()));
+        PAPER_PLANE_REQUESTS.entrySet().removeIf(entry -> {
+            TPARequest request = TPACommand.requests().get(entry.getKey());
+            return request == null || request.source().getUuid().equals(player.getUUID()) || request.target().getUuid().equals(player.getUUID());
+        });
     }
 
     public static boolean hasConsumablePlane(ServerPlayer player) {
@@ -116,6 +112,15 @@ public final class PaperPlane {
         return true;
     }
 
+    private static TPARequest findFtbRequest(ServerPlayer requester, ServerPlayer target) {
+        for (TPARequest request : TPACommand.requests().values()) {
+            if (request.source().getUuid().equals(requester.getUUID()) && request.target().getUuid().equals(target.getUUID()) && !request.here()) {
+                return request;
+            }
+        }
+        return null;
+    }
+
     private static int findConsumablePlaneSlot(ServerPlayer player) {
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             ItemStack stack = player.getInventory().getItem(i);
@@ -124,9 +129,5 @@ public final class PaperPlane {
             }
         }
         return -1;
-    }
-
-    public static boolean isServerPlayer(Entity entity) {
-        return entity instanceof ServerPlayer;
     }
 }

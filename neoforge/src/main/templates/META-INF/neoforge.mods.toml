@@ -29,3 +29,10 @@ type = "required"
 versionRange = "${ftb_library_version_range}"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "ftbessentials"
+type = "required"
+versionRange = "${ftb_essentials_version_range}"
+ordering = "AFTER"
+side = "BOTH"
