@@ -1,10 +1,8 @@
 package dev.rinchan.paperplane.neoforge;
 
-import dev.rinchan.paperplane.AnswerTeleportRequestPacket;
 import dev.rinchan.paperplane.OpenTeleportScreenPacket;
 import dev.rinchan.paperplane.PaperPlane;
 import dev.rinchan.paperplane.RequestTeleportPacket;
-import dev.rinchan.paperplane.TeleportRequestPromptPacket;
 import dev.rinchan.paperplane.client.PaperPlaneClient;
 import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,20 +34,10 @@ public class PaperPlaneNeoForge {
         registrar.playToClient(OpenTeleportScreenPacket.TYPE, OpenTeleportScreenPacket.CODEC, (packet, context) -> {
             context.enqueueWork(() -> PaperPlaneClient.openTeleportScreen(packet)).exceptionally(throwable -> null);
         });
-        registrar.playToClient(TeleportRequestPromptPacket.TYPE, TeleportRequestPromptPacket.CODEC, (packet, context) -> {
-            context.enqueueWork(() -> PaperPlaneClient.openRequestPrompt(packet)).exceptionally(throwable -> null);
-        });
         registrar.playToServer(RequestTeleportPacket.TYPE, RequestTeleportPacket.CODEC, (packet, context) -> {
             context.enqueueWork(() -> {
                 if (context.player() instanceof ServerPlayer player) {
                     PaperPlane.requestTeleport(player, packet.targetId(), packet.enderPlane());
-                }
-            }).exceptionally(throwable -> null);
-        });
-        registrar.playToServer(AnswerTeleportRequestPacket.TYPE, AnswerTeleportRequestPacket.CODEC, (packet, context) -> {
-            context.enqueueWork(() -> {
-                if (context.player() instanceof ServerPlayer player) {
-                    PaperPlane.answerTeleport(player, packet.requestId(), packet.accepted());
                 }
             }).exceptionally(throwable -> null);
         });

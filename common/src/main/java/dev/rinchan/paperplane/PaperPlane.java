@@ -16,7 +16,7 @@ public final class PaperPlane {
     public static final String MOD_ID = "paper_plane";
 
     private static final TPACommand FTB_TPA = new TPACommand();
-    private static final Map<UUID, Boolean> PAPER_PLANE_REQUESTS = new ConcurrentHashMap<>();
+    private static final Map<UUID, RequestData> REQUESTS = new ConcurrentHashMap<>();
 
     private PaperPlane() {
     }
@@ -45,55 +45,29 @@ public final class PaperPlane {
             return;
         }
 
-        TPARequest ftbRequest = findFtbRequest(requester, target);
-        if (ftbRequest == null) {
-            requester.sendSystemMessage(Component.translatable("message.paper_plane.request_missing").withStyle(ChatFormatting.RED));
-            return;
+        TPARequest request = findFtbRequest(requester, target);
+        if (request != null) {
+            REQUESTS.put(request.id(), new RequestData(requester.getUUID(), enderPlane));
         }
-
-        PAPER_PLANE_REQUESTS.put(ftbRequest.id(), enderPlane);
-        PacketDistributor.sendToPlayer(target, new TeleportRequestPromptPacket(ftbRequest.id(), requester.getGameProfile().getName(), enderPlane));
     }
 
-    public static void answerTeleport(ServerPlayer target, UUID requestId, boolean accepted) {
-        Boolean enderPlane = PAPER_PLANE_REQUESTS.get(requestId);
-        if (enderPlane == null) {
-            target.sendSystemMessage(Component.translatable("message.paper_plane.request_missing").withStyle(ChatFormatting.RED));
+    public static void finishAcceptedRequest(ServerPlayer target, UUID requestId) {
+        RequestData data = REQUESTS.remove(requestId);
+        if (data == null || data.enderPlane()) {
             return;
         }
+        ServerPlayer requester = target.server.getPlayerList().getPlayer(data.requesterId());
+        if (requester != null) {
+            consumePlane(requester);
+        }
+    }
 
-        TPARequest request = TPACommand.requests().get(requestId);
-        if (request == null) {
-            target.sendSystemMessage(Component.translatable("message.paper_plane.request_missing").withStyle(ChatFormatting.RED));
-            return;
-        }
-        ServerPlayer requester = target.server.getPlayerList().getPlayer(request.source().getUuid());
-        if (requester == null) {
-            target.sendSystemMessage(Component.translatable("message.paper_plane.requester_offline").withStyle(ChatFormatting.RED));
-            return;
-        }
-
-        if (!accepted) {
-            PAPER_PLANE_REQUESTS.remove(requestId);
-            FTB_TPA.tpdeny(target, requestId.toString());
-            return;
-        }
-        if (!enderPlane && !hasConsumablePlane(requester)) {
-            requester.sendSystemMessage(Component.translatable("message.paper_plane.no_plane").withStyle(ChatFormatting.RED));
-            target.sendSystemMessage(Component.translatable("message.paper_plane.requester_no_plane").withStyle(ChatFormatting.RED));
-            return;
-        }
-        int result = FTB_TPA.tpaccept(target, requestId.toString());
-        if (result > 0) {
-            PAPER_PLANE_REQUESTS.remove(requestId);
-            if (!enderPlane) {
-                consumePlane(requester);
-            }
-        }
+    public static void forgetRequest(UUID requestId) {
+        REQUESTS.remove(requestId);
     }
 
     public static void clearPlayer(ServerPlayer player) {
-        PAPER_PLANE_REQUESTS.entrySet().removeIf(entry -> {
+        REQUESTS.entrySet().removeIf(entry -> {
             TPARequest request = TPACommand.requests().get(entry.getKey());
             return request == null || request.source().getUuid().equals(player.getUUID()) || request.target().getUuid().equals(player.getUUID());
         });
@@ -129,5 +103,8 @@ public final class PaperPlane {
             }
         }
         return -1;
+    }
+
+    private record RequestData(UUID requesterId, boolean enderPlane) {
     }
 }

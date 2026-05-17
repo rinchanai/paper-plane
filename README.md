@@ -1,10 +1,10 @@
-# 纸飞机
+# Paper Plane
 
-纸飞机 adds early-game player-to-player teleport requests through an FTB Library UI backed by FTB Essentials' TPA system.
+Paper Plane adds item-driven player-to-player teleport requests through an FTB Library player picker backed by FTB Essentials' TPA system.
 
 ## Features
 
-- Craft a **纸飞机** from five pieces of paper:
+- Craft a **Paper Plane** from five pieces of paper:
 
 ```text
 x - -
@@ -12,13 +12,11 @@ x x x
 x - -
 ```
 
-- Right-click a 纸飞机 to open a player list UI and send a teleport request.
-- The target player receives an accept/deny UI.
-- Requests and acceptance are backed by FTB Essentials' TPA request handling.
-- When accepted, the requester teleports to the target player and consumes one normal/soggy paper plane.
+- Right-click a Paper Plane to open a player list UI and send an FTB Essentials TPA request.
+- The target player receives FTB Essentials' standard clickable accept/deny chat prompt.
 - Shift-right-click throws a paper plane as a slow arrow-like projectile.
-- A normal paper plane that gets wet becomes **飞不起来的纸飞机？**.
-- Craft an **末影纸飞机** with eight ender pearls around a paper plane; it can send teleport requests without being consumed.
+- A normal Paper Plane that gets wet becomes a **Soggy Paper Plane**.
+- Craft an **Ender Paper Plane** with eight ender pearls around a Paper Plane; it can send requests without being consumed.
 
 ## Requirements
 

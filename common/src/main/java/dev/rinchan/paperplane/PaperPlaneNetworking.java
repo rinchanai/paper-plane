@@ -24,10 +24,6 @@ public final class PaperPlaneNetworking {
         PacketDistributor.sendToServer(new RequestTeleportPacket(target.id(), enderPlane));
     }
 
-    public static void answerRequest(java.util.UUID requestId, boolean accepted) {
-        PacketDistributor.sendToServer(new AnswerTeleportRequestPacket(requestId, accepted));
-    }
-
     public interface UUIDLikeTarget {
         java.util.UUID id();
     }
