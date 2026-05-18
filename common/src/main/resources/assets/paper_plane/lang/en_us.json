@@ -1,6 +1,6 @@
 {
   "item.paper_plane.paper_plane": "Paper Plane",
-  "item.paper_plane.soggy_paper_plane": "Soggy Paper Plane",
+  "item.paper_plane.soggy_paper_plane": "Paper Plane That Can't Fly?",
   "item.paper_plane.ender_paper_plane": "Ender Paper Plane",
   "entity.paper_plane.paper_plane": "Paper Plane",
   "screen.paper_plane.title": "Choose a player to teleport to",
@@ -8,5 +8,5 @@
   "screen.paper_plane.no_players": "No other players are online",
   "message.paper_plane.target_offline": "That player is offline.",
   "message.paper_plane.no_self": "You cannot send a teleport request to yourself.",
-  "message.paper_plane.no_plane": "You need 1 Paper Plane or Soggy Paper Plane."
+  "message.paper_plane.no_plane": "You need 1 Paper Plane or Paper Plane That Can't Fly?"
 }
