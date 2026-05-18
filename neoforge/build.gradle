@@ -17,6 +17,8 @@ sourceSets.main.resources.srcDir tasks.register('generateModMetadata', ProcessRe
         loader_version_range   : rootProject.loader_version_range,
         ftb_library_version_range: rootProject.ftb_library_version_range,
         ftb_essentials_version_range: rootProject.ftb_essentials_version_range,
+        lychee_version_range   : rootProject.lychee_version_range,
+        kiwi_version_range     : rootProject.kiwi_version_range,
         mod_id                 : rootProject.mod_id,
         mod_name               : rootProject.mod_name,
         mod_license            : rootProject.mod_license,
@@ -58,6 +60,8 @@ dependencies {
     runtimeOnly "curse.maven:ftb-library-forge-404465:${rootProject.ftb_library_file_id}"
     runtimeOnly "curse.maven:ftb-essentials-410811:${rootProject.ftb_essentials_file_id}"
     runtimeOnly "maven.modrinth:architectury-api:13.0.8+neoforge"
+    runtimeOnly "maven.modrinth:lychee:${rootProject.lychee_version}"
+    runtimeOnly "maven.modrinth:kiwi:${rootProject.kiwi_version}"
 }
 
 publishing {

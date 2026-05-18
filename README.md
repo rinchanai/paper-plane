@@ -15,7 +15,7 @@ x - -
 - Right-click a Paper Plane to open a player list UI and send an FTB Essentials TPA request.
 - The target player receives FTB Essentials' standard clickable accept/deny chat prompt.
 - Shift-right-click throws a paper plane as a slow arrow-like projectile.
-- A normal Paper Plane that gets wet becomes **Paper Plane That Can't Fly?**.
+- Drop a normal Paper Plane into water to turn it into **Paper Plane That Can't Fly?** through a Lychee item-inside-liquid recipe.
 - Craft an **Ender Paper Plane** with eight ender pearls around a Paper Plane; it can send requests without being consumed.
 
 ## Requirements
@@ -25,3 +25,5 @@ x - -
 - FTB Essentials
 - FTB Library
 - Architectury API, required by FTB Library
+- Lychee
+- Kiwi, required by Lychee

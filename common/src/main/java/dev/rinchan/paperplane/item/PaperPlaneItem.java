@@ -2,14 +2,12 @@ package dev.rinchan.paperplane.item;
 
 import dev.rinchan.paperplane.PaperPlane;
 import dev.rinchan.paperplane.entity.PaperPlaneEntity;
-import dev.rinchan.paperplane.registry.PaperPlaneRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -35,13 +33,6 @@ public class PaperPlaneItem extends Item {
             PaperPlane.openTeleportScreen(serverPlayer, enderPlane);
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
-    }
-
-    @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        if (!enderPlane && !level.isClientSide() && entity instanceof Player player && entity.isInWater()) {
-            player.getInventory().setItem(slot, stack.transmuteCopy(PaperPlaneRegistries.SOGGY_PAPER_PLANE.get(), stack.getCount()));
-        }
     }
 
     private void throwPlane(Level level, Player player, ItemStack stack, InteractionHand hand) {
